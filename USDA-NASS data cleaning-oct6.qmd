@@ -714,13 +714,12 @@ title ="Organic Strawberry Sales ($) in 2021")
 
 ## chemicals
 ```{r}
-strwb_survey_chem1 <- strwb_survey |> mutate(`Chemical Type` = 
-                                               str_sub(Domain,str_locate(Domain,"CHEMICAL,")[,2]+1,),
-                                             .after= `Domain Category`)
+
 
 ```
 
 ### carcinogens from WHO list
+
 
 
 #### updated
@@ -830,9 +829,9 @@ strwb_survey <- strwb_survey |>
   separate_wider_delim(  cols = `Data Item`,
                          delim = ",",
                          names = c("temp1",
-                                 "temp2",
-                                 "temp3",
-                                 "temp4"),
+                                 "Marketing vs Production",
+                                 "Measurement Unit",
+                                 "Aggregate type"),
                          too_many = "error",
                          too_few = "align_start"
                        )
@@ -840,8 +839,8 @@ strwb_survey <- strwb_survey |>
 strwb_survey <- strwb_survey |>
   separate_wider_delim(  cols = temp1,
                          delim = " - ",
-                         names = c("temp1a",
-                                 "temp1b"),
+                         names = c("Fruit",
+                                 "Price or Weight?"),
                          too_many = "error",
                          too_few = "align_start"
                        )
@@ -858,19 +857,19 @@ Domain
 #| echo: false
 #| eval: true
 
-strwb_survey <- strwb_survey |>
-  separate_wider_delim(  cols = Domain,
-                         delim = ",",
-                         names = c("temp22",
-                                 "temp23"),
-                         too_many = "error",
-                         too_few = "align_start"
-                       )
+#strwb_survey <- strwb_survey |>
+#  separate_wider_delim(  cols = Domain,
+  #                       delim = ",",
+  #                       names = c("temp22",
+  #                               "temp23"),
+  #                       too_many = "error",
+  #                       too_few = "align_start"
+  #                     )
 
 
-t22 <- unique(strwb_survey$temp22)
+#t22 <- unique(strwb_survey$temp22)
 
-t23 <- unique(strwb_survey$temp23)
+#t23 <- unique(strwb_survey$temp23)
 
 
 ```
@@ -883,18 +882,38 @@ Domain Category
 #| eval: true
 
 
-strwb_survey <- strwb_survey |>
-  separate_wider_delim(  cols = `Domain Category`,
-                         delim = ",",
-                         names = c("temp42",
-                                 "temp43",
-                                 "temp44",
-                                 "temp45"),
-                         too_many = "error",
-                         too_few = "align_start"
-                       )
+#strwb_survey <- strwb_survey |>
+# separate_wider_delim(  cols = `Domain Category`,
+#                         delim = ",",
+#                         names = c("temp42",
+#                                 "temp43",
+#                                 "temp44",
+#                                 "temp45"),
+#                         too_many = "error",
+#                         too_few = "align_start"
+#                       )
 
+#Getting the Chemical Type and putting it into its own column
+strwb_survey_chem1 <- strwb_survey |> mutate(`Chemical Type` = 
+                                               str_sub(Domain,str_locate(Domain,"CHEMICAL,")[,2]+1,),
+                                             .after= `Domain Category`)
 
+#Extracting Chemical Name into a column
+strwb_survey_chem1<- strwb_survey_chem1 |> mutate(`Chemical Name`=
+                                                    str_sub(`Domain Category`,
+                                                    str_locate(`Domain Category`,":")[,2]+3,
+                                                    str_locate(`Domain Category`,"=")[,1]-2),
+                                                  .after = `Chemical Type`)
+#Extracting Chemical ID into a column
+strwb_survey_chem1<- strwb_survey_chem1 |> mutate(`Chemical ID`=
+                                                    str_sub(`Domain Category`,-7), .after= `Chemical Name`)
+strwb_survey_chem1$`Chemical ID`<- str_sub(strwb_survey_chem1$`Chemical ID`,1,-2)
+strwb_survey_chem1$`Chemical ID`<- ifelse(strwb_survey_chem1$Domain=="TOTAL",NA,strwb_survey_chem1$`Chemical ID`)
+strwb_survey_chem1$`Chemical ID`<- ifelse(str_detect(strwb_survey_chem1$`Domain Category`,"TOTAL")==TRUE,NA,strwb_survey_chem1$`Chemical ID`)
+strwb_survey_chem1$`Chemical ID`<- str_replace(strwb_survey_chem1$`Chemical ID`,"=","")
+strwb_survey_chem1$`Chemical ID`<- str_trim(strwb_survey_chem1$`Chemical ID`, side = 'both')
+
+strwb_survey_chem <- strwb_survey_chem1 |> select(-c(Domain,`Domain Category`))
 
 
 ```
