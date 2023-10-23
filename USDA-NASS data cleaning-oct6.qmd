@@ -829,9 +829,9 @@ strwb_survey <- strwb_survey |>
   separate_wider_delim(  cols = `Data Item`,
                          delim = ",",
                          names = c("temp1",
-                                 "Pesticide or Market",
-                                 "Measurement Unit",
-                                 "Aggregate type"),
+                                 "Pesticide_or_Market",
+                                 "Measurement_Unit",
+                                 "Aggregate_type"),
                          too_many = "error",
                          too_few = "align_start"
                        )
@@ -840,7 +840,7 @@ strwb_survey <- strwb_survey |>
   separate_wider_delim(  cols = temp1,
                          delim = " - ",
                          names = c("Fruit",
-                                 "Price or Weight?"),
+                                 "Price_or_Weight?"),
                          too_many = "error",
                          too_few = "align_start"
                        )
@@ -871,6 +871,8 @@ Domain
 
 #t23 <- unique(strwb_survey$temp23)
 
+write.csv(strwb_survey, "/Users/ajaykrishnakumar/Desktop/MSSP/Data Science in R/NASS-Strawberries/strwb_survey.csv",
+          row.names=FALSE)
 
 ```
 
@@ -893,23 +895,30 @@ Domain Category
 #                         too_few = "align_start"
 #                       )
 
+
+strwb_survey<- read.csv("strwb_survey.csv", header = TRUE)
+
+#Extracting the data relevant to chemicals using the Pesticide or Market Column
+
+strwb_survey_c<- strwb_survey |> filter(Pesticide_or_Market == " BEARING - APPLICATIONS")
+strwb_mkt<- strwb_survey |> filter(Pesticide_or_Market != " BEARING - APPLICATIONS")
 #Getting the Chemical Type and putting it into its own column
-strwb_survey_chem1 <- strwb_survey |> mutate(`Chemical Type` = 
+strwb_survey_chem1 <- strwb_survey_c |> mutate(`Chemical Type` = 
                                                str_sub(Domain,str_locate(Domain,"CHEMICAL,")[,2]+1,),
-                                             .after= `Domain Category`)
+                                             .after= Domain.Category)
 
 #Extracting Chemical Name into a column
 strwb_survey_chem1<- strwb_survey_chem1 |> mutate(`Chemical Name`=
-                                                    str_sub(`Domain Category`,
-                                                    str_locate(`Domain Category`,":")[,2]+3,
-                                                    str_locate(`Domain Category`,"=")[,1]-2),
+                                                    str_sub(Domain.Category,
+                                                    str_locate(Domain.Category,":")[,2]+3,
+                                                    str_locate(Domain.Category,"=")[,1]-2),
                                                   .after = `Chemical Type`)
 #Extracting Chemical ID into a column
 strwb_survey_chem1<- strwb_survey_chem1 |> mutate(`Chemical ID`=
-                                                    str_sub(`Domain Category`,-7), .after= `Chemical Name`)
+                                                    str_sub(Domain.Category,-7), .after= `Chemical Name`)
 strwb_survey_chem1$`Chemical ID`<- str_sub(strwb_survey_chem1$`Chemical ID`,1,-2)
 strwb_survey_chem1$`Chemical ID`<- ifelse(strwb_survey_chem1$Domain=="TOTAL",NA,strwb_survey_chem1$`Chemical ID`)
-strwb_survey_chem1$`Chemical ID`<- ifelse(str_detect(strwb_survey_chem1$`Domain Category`,"TOTAL")==TRUE,NA,strwb_survey_chem1$`Chemical ID`)
+strwb_survey_chem1$`Chemical ID`<- ifelse(str_detect(strwb_survey_chem1$Domain.Category,"TOTAL")==TRUE,NA,strwb_survey_chem1$`Chemical ID`)
 strwb_survey_chem1$`Chemical ID`<- str_replace(strwb_survey_chem1$`Chemical ID`,"=","")
 strwb_survey_chem1$`Chemical ID`<- str_trim(strwb_survey_chem1$`Chemical ID`, side = 'both')
 

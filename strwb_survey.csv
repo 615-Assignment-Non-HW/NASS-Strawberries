@@ -1,4 +1,4 @@
-"Program","Year","Period","State","State ANSI","Fruit","Price or Weight?","Pesticide or Market","Measurement Unit","Aggregate type","Domain","Domain Category","Value","CV (%)"
+"Program","Year","Period","State","State ANSI","Fruit","Price_or_Weight?","Pesticide_or_Market","Measurement_Unit","Aggregate_type","Domain","Domain Category","Value","CV (%)"
 "SURVEY",2022,"MARKETING YEAR","CALIFORNIA","06","STRAWBERRIES","PRICE RECEIVED"," MEASURED IN $ / CWT",NA,NA,"TOTAL","NOT SPECIFIED","108",NA
 "SURVEY",2022,"MARKETING YEAR","CALIFORNIA","06","STRAWBERRIES",NA," FRESH MARKET - PRICE RECEIVED"," MEASURED IN $ / CWT",NA,"TOTAL","NOT SPECIFIED","(D)",NA
 "SURVEY",2022,"MARKETING YEAR","CALIFORNIA","06","STRAWBERRIES",NA," PROCESSING - PRICE RECEIVED"," MEASURED IN $ / CWT",NA,"TOTAL","NOT SPECIFIED","(D)",NA
