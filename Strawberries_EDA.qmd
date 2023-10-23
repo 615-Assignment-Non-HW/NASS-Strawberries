@@ -1,7 +1,15 @@
 ---
-title: "Stawberries"
-author: MA615
-date: 2023 Sept 25
-format: html
+title: "Strawberries"
+author: "Ajay Krishnakumar"
+date: 2023 Oct 23
+format: pdf
 engine: knitr
 ---
+
+## Introduction: The data, the motivations
+
+When was the last time you looked at your strawberries - not just a cursory examination before you ate them, but really looked? At the labels, at the warnings and cautions and USDA certifications and the chemicals they spray on them? I had certainly never considered any of those factors until this assignment, until we were told that perhaps this was something to look into, until Haviland Wright painted for us the extent to which strawberries are not to be trusted.
+
+The data itself is from the USDA NASS database, cleaned through much effort by Haviland(though perhaps not one hundredth of the effort we should put into cleaning our strawberries if the results of this exercise are anything to go by). It is this data collected by survey instead of census and focusing on non organic strawberries that serves as the jumping off point for what follows.
+
+##Data Cleaning and Organization
