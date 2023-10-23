@@ -829,7 +829,7 @@ strwb_survey <- strwb_survey |>
   separate_wider_delim(  cols = `Data Item`,
                          delim = ",",
                          names = c("temp1",
-                                 "Marketing vs Production",
+                                 "PriceorWeight_Market",
                                  "Measurement Unit",
                                  "Aggregate type"),
                          too_many = "error",
@@ -840,7 +840,7 @@ strwb_survey <- strwb_survey |>
   separate_wider_delim(  cols = temp1,
                          delim = " - ",
                          names = c("Fruit",
-                                 "Price or Weight?"),
+                                 "Price or Production?"),
                          too_many = "error",
                          too_few = "align_start"
                        )
@@ -1021,7 +1021,7 @@ avg_chem <- chem |> filter(`Aggregate type`==" AVG")
 non_avg_chem <- chem |> filter(is.na(`Aggregate type`)==TRUE)
 
 ```
-A look at the two data frames created as above gives us interesting information. It would appear that the 'non_avg-chem' data shows the total weight in pounds of a particular fertilizer applied in that particular Year. The 'avg-chem' data looks at various 'average' data. I would contend that average is a little bit of a misnomer here and calling these 'per unit' data would be more informative. 
+A look at the two data frames created as above gives us interesting information. It would appear that the 'non_avg-chem' data shows the total weight in pounds of a particular fertilizer applied in that particular Year. The 'avg-chem' data looks at various 'average' data. I would contend that average is a little bit of a misnomer here and calling these 'per unit' data would be more informative. We have lb/acre/year, lb/acre/application and the 'number'
 
 ## references
 
