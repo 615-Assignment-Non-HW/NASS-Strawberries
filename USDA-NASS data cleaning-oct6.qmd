@@ -957,7 +957,11 @@ CAS_no<- c("131860-33-8","","","","","","1219521-95-5","1303-96-4","188425-85-6"
 chemical_list$CAS_no<- CAS_no
 
 library(readxl)
-hazards <- read_excel("UN data.xlsx")
+hazards <- read_xlsx("UN data.xlsx")
+hazards$CAS_codes <- str_trim(
+  str_sub(str_trim(hazards$CAS, "both"),1,str_locate(hazards$CAS," ")[1]),"both") 
+
+hazards$Toxicity<- str_sub()
 
 ```
 
