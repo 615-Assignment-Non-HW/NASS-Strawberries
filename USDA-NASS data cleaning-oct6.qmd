@@ -982,7 +982,15 @@ hazards$Hazard <- ifelse(hazards$Toxicity=="Ia","Extremely hazardous",
                   ifelse(hazards$Toxicity =="U","Not acutely hazardous",
                   ifelse(hazards$Toxicity=="FM","Fumigant","Obsolete"))))))
 
-hazard_info<- merge(chemical_list,hazards,by="CAS_no", all.chemical_list=TRUE)
+hazard_info<- merge(x =chemical_list,y=hazards,by="CAS_no", x.chemical_list=TRUE)
+
+strwb_chem_info<- merge(x=strwb_survey_chem,y=hazard_info, by= "Chemical Name", all.x=TRUE)
+
+```
+
+So now that we have hazard data - lets have a look at what it tells us:
+
+```{r}
 
 ```
 
