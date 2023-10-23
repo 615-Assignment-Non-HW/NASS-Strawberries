@@ -1021,7 +1021,7 @@ avg_chem <- chem |> filter(`Aggregate type`==" AVG")
 non_avg_chem <- chem |> filter(is.na(`Aggregate type`)==TRUE)
 
 ```
-A comparison between these two dataframes would 
+A look at the two data frames created as above gives us interesting information. It would appear that the 'non_avg-chem' data shows the total weight in pounds of a particular fertilizer applied in that particular Year. The 'avg-chem' data looks at various 'average' data. I would contend that average is a little bit of a misnomer here and calling these 'per unit' data would be more informative. 
 
 ## references
 
