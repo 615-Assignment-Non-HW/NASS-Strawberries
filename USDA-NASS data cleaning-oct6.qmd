@@ -974,7 +974,6 @@ hazards$Toxicity <- str_match(hazards$Toxicity, " \\s*(.*?)\\s* ")[,2]
 
 hazards<- hazards |> select(-CAS)
 
-
 hazards$Hazard <- ifelse(hazards$Toxicity=="Ia","Extremely hazardous",
                   ifelse(hazards$Toxicity=="Ib","Highly hazardous",
                   ifelse(hazards$Toxicity=="II","Moderately hazardous",
@@ -984,16 +983,45 @@ hazards$Hazard <- ifelse(hazards$Toxicity=="Ia","Extremely hazardous",
 
 hazard_info<- merge(x =chemical_list,y=hazards,by="CAS_no", x.chemical_list=TRUE)
 
-strwb_chem_info<- merge(x=strwb_survey_chem,y=hazard_info, by= "Chemical Name", all.x=TRUE)
+hazard_info<-rbind(hazard_info,c("20543-04-8","COPPER OCTANOATE","	
+23306","U","Not acutely hazardous"))
 
+hazard_info<-rbind(hazard_info,c("2180409-60-3","	
+CYFLUFENAMID","555550","U","Not acutely hazardous"))
+
+hazard_info<-rbind(hazard_info,c("121552-61-2","CYPRODINIL","	
+288202","U","Not acutely hazardous"))
+
+hazard_info<-rbind(hazard_info,c("70630-17-0","	
+MEFENOXAM","113502","III","Slightly hazardous"))
+
+hazard_info<-rbind(hazard_info,c("","PAECILOMYCES FUMOSOR","115002","U",
+                                 "Not acutely hazardous"))
+
+
+strwb_chem_info<- merge(x=strwb_survey_chem,y=hazard_info, by= "Chemical Name", 
+                        all.x=TRUE)
+
+strwb_chem_info$Value <- ifelse(strwb_chem_info$Value == "(D)", NA,
+                                strwb_chem_info$Value)
+strwb_chem_info$Value <- ifelse(strwb_chem_info$Value == "	
+(NA)", NA,strwb_chem_info$Value)
 ```
 
 So now that we have hazard data - lets have a look at what it tells us:
 
 ```{r}
+#We are going to filter our data set so we look only at those entries for which we have hazard information
+
+chem<- strwb_chem_info |> filter(is.na(Hazard)!=TRUE)
+
+#Data with the aggregate type = AVG. What does AVG actually show us?
+
+avg_chem <- chem |> filter(`Aggregate type`==" AVG")
+non_avg_chem <- chem |> filter(is.na(`Aggregate type`)==TRUE)
 
 ```
-
+A comparison between these two dataframes would 
 
 ## references
 
