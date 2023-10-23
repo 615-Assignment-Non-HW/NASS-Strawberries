@@ -829,7 +829,7 @@ strwb_survey <- strwb_survey |>
   separate_wider_delim(  cols = `Data Item`,
                          delim = ",",
                          names = c("temp1",
-                                 "PriceorWeight_Market",
+                                 "Pesticide or Market",
                                  "Measurement Unit",
                                  "Aggregate type"),
                          too_many = "error",
@@ -840,7 +840,7 @@ strwb_survey <- strwb_survey |>
   separate_wider_delim(  cols = temp1,
                          delim = " - ",
                          names = c("Fruit",
-                                 "Price or Production?"),
+                                 "Price or Weight?"),
                          too_many = "error",
                          too_few = "align_start"
                        )
