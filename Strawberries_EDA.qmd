@@ -37,6 +37,8 @@ strwb_survey_c<- strwb_survey |> filter(Pesticide_or_Market == " BEARING - APPLI
 strwb_mkt<- strwb_survey |> filter(Pesticide_or_Market != " BEARING - APPLICATIONS")
 ```
 
+#### Cleaning Market Data
+
 Let us consider first, the market data. A view statement shows us what it looks like and what needs to be done to clean it. I won't print that View statement here but suffice it to say there are changes that can be made here to clean the data. First the column I have named Price or Weight. It transpires that this is hardly an appropriate name.
 
 ```{r}
@@ -69,5 +71,66 @@ strwb_mkt<- strwb_mkt |> rename(
                                 Purpose = Pesticide_or_Market
 )
 
-
 ```
+
+But now we see the Purpose column doesn't always have purpose. Sometimes it contains what is very clearly the Measurement Unit, while the Measurement Unit itself is NA. Let's fix this too.
+
+```{r}
+strwb_mkt$Measurement_Unit<- ifelse(is.na(strwb_mkt$Measurement_Unit),
+                                    strwb_mkt$Purpose,strwb_mkt$Measurement_Unit)
+strwb_mkt$Purpose<- str_replace(strwb_mkt$Purpose,"- PRICE RECEIVED","")
+strwb_mkt$Purpose<- str_replace(strwb_mkt$Purpose,"- PRODUCTION","")
+
+strwb_mkt$Purpose<- ifelse(str_detect(strwb_mkt$Purpose,"MEASURED")==TRUE, "AGGREGATE",
+                           strwb_mkt$Purpose)
+
+strwb_mkt$Aggregate_type<- ifelse(strwb_mkt$Purpose == "Aggregate", 
+                                  strwb_mkt$Measurement_Unit,
+                                  strwb_mkt$Aggregate_type)
+```
+
+Measurement Unit doesn't seem to always represent measurement unit and in fact probably contains aggregate type instead - for example where it says "Production Utilization".  Let's fix that:
+
+```{r}
+
+a<- strwb_mkt$Measurement_Unit[which(str_detect(strwb_mkt$Measurement_Unit,"MEASURED")==FALSE)]
+b<- strwb_mkt$Aggregate_type[which(str_detect(strwb_mkt$Measurement_Unit,"MEASURED")==FALSE)]
+
+strwb_mkt$Aggregate_type[which(str_detect(strwb_mkt$Measurement_Unit,"MEASURED")==FALSE)]<- a
+strwb_mkt$Measurement_Unit[which(str_detect(strwb_mkt$Measurement_Unit,"MEASURED")==FALSE)]<- b
+
+#Casting all non numeric values as NA
+strwb_mkt$Value<- suppressWarnings(as.numeric(strwb_mkt$Value))
+```
+
+That's the market data cleaned.
+
+#### Chemical Data
+
+We start by extracting all the chemical information we can from the data we have. This is stored in the Domain and Domain Category columns.
+
+```{r}
+#Getting the Chemical Type and putting it into its own column
+strwb_survey_chem1 <- strwb_survey_c |> mutate(`Chemical Type` = 
+                                               str_sub(Domain,str_locate(Domain,"CHEMICAL,")[,2]+1,),
+                                             .after= Domain.Category)
+
+#Extracting Chemical Name into a column
+strwb_survey_chem1<- strwb_survey_chem1 |> mutate(`Chemical Name`=
+                                                    str_sub(Domain.Category,
+                                                    str_locate(Domain.Category,":")[,2]+3,
+                                                    str_locate(Domain.Category,"=")[,1]-2),
+                                                  .after = `Chemical Type`)
+#Extracting Chemical ID into a column
+strwb_survey_chem1<- strwb_survey_chem1 |> mutate(`Chemical ID`=
+                                                    str_sub(Domain.Category,-7), .after= `Chemical Name`)
+strwb_survey_chem1$`Chemical ID`<- str_sub(strwb_survey_chem1$`Chemical ID`,1,-2)
+strwb_survey_chem1$`Chemical ID`<- ifelse(strwb_survey_chem1$Domain=="TOTAL",NA,strwb_survey_chem1$`Chemical ID`)
+strwb_survey_chem1$`Chemical ID`<- ifelse(str_detect(strwb_survey_chem1$Domain.Category,"TOTAL")==TRUE,NA,strwb_survey_chem1$`Chemical ID`)
+strwb_survey_chem1$`Chemical ID`<- str_replace(strwb_survey_chem1$`Chemical ID`,"=","")
+strwb_survey_chem1$`Chemical ID`<- str_trim(strwb_survey_chem1$`Chemical ID`, side = 'both')
+
+strwb_survey_chem<- strwb_survey_chem1
+```
+
+Now we will use the PC codes we've extracted and placed in Chemical ID and use the
