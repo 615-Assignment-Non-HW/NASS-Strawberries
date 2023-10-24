@@ -12,11 +12,13 @@ When was the last time you looked at your strawberries - not just a cursory exam
 
 -   What sort of chemicals are being used on strawberries?
 -   How hazardous are these chemicals?
--   Where are these chemicals used most
+-   Where are these chemicals used most?
 
 Considering the consistent placing of Strawberries on the 'Dirty Dozen' list, these are but a few of the questions we should think about. As consumers we should be concerned about the extensive use of pesticide in daily foods. As human beings with our instinct for self-preservation, we should be concerned about the chemicals we are putting in our bodies. So what can the data tell us? How alarmed should we be? I'll try to answer that first question. The second is left as an exercise for the reader.
 
-The data itself is from the USDA NASS database, cleaned through much effort by Haviland(though perhaps not one hundredth of the effort we should put into cleaning our strawberries if the results of this exercise are anything to go by). It is this data collected by survey instead of census and focusing on non organic strawberries that serves as the jumping off point for what follows.
+Before getting into the weeds with the pesticides, we shall also look at data on market information. Is there anything we can say about prices of strawberries, their end uses? It would certainly be a useful lens with which to color our later analysis.
+
+The data itself is from the USDA NASS database, cleaned through much effort by Haviland(though perhaps not one hundredth of the effort we should put into cleaning our strawberries if the results of this exercise are anything to go by). It is this data - collected by survey instead of census and focusing on non organic strawberries - that serves as the jumping off point for what follows.
 
 ## Data Cleaning and Organization
 
@@ -272,8 +274,8 @@ ggplot(prices, aes(Purpose, Value))+
   
 
 ```
-We can tell from this graph that the overwhelming majority of fresh market strawberries are sold for significantly more than processing market strawberries. Just compare the median price per hundredweight(the middle lines in the violin plots). What's interesting is that the interquartile range for the two seems very similar at $40/cwt. The minimum and maximum values for fresh market strawberries are miles apart however. 
-This might be due to transportation costs or the mark-up at places like farmers markets, say. 
+
+We can tell from this graph that the overwhelming majority of fresh market strawberries are sold for significantly more than processing market strawberries. Just compare the median price per hundredweight(the middle lines in the violin plots). What's interesting is that the interquartile range for the two seems very similar at \$40/cwt. The minimum and maximum values for fresh market strawberries are miles apart however. This might be due to transportation costs or the mark-up at places like farmers markets, say.
 
 What can we tell about how the difference in fresh market and processing varies between states?
 
@@ -306,21 +308,21 @@ ggplot(diff_state_prices, aes(State, market_diff, color = Year))+
 
 
 ```
-We can see that california, relative to other states is relatively consistent in the difference in price of fresh market and production market strawberries. It is also on the lower side. North Carolina has the largest variation in the difference. 
 
-What's also interesting here is how in 2016, east coast states observed a higher difference in price relative to west coast states. 
+We can see that california, relative to other states is relatively consistent in the difference in price of fresh market and production market strawberries. It is also on the lower side. North Carolina has the largest variation in the difference.
+
+What's also interesting here is how in 2016, east coast states observed a higher difference in price relative to west coast states.
 
 What about yearly variations in these prices?
+
 ```{r}
 g<-ggplot(data=prices, aes(Year, Value, color=Purpose))+
   geom_point()+suppressWarnings(stat_smooth())
 suppressWarnings(print(g))
 ```
-There is a limited amount of information we can glean from this - this is reflected in the increasing area of the error 'shadow' around the line. In large part this is due to the dwindling number of points each consecutive year. All the same, we can see that in none of the years do any of the fresh market prices go beneath those of even the highest production market. The overlap of the shadows towards the end might indicate that perhaps we might find a point or two like that if we had data for more recent years. That is certainly interesting. Were that to be true, what would drive that reversal of the dynamic of the two prices? 
 
-Maybe there's a world(not this world and not  a world we can infer from the data above) where people buy fewer fresh strawberries. Why? Let's look at some analysis of Chemical data to see if there are any reasons to avoid strawberries. 
+There is a limited amount of information we can glean from this - this is reflected in the increasing area of the error 'shadow' around the line. In large part this is due to the dwindling number of points each consecutive year. All the same, we can see that in none of the years do any of the fresh market prices go beneath those of even the highest production market. The overlap of the shadows towards the end might indicate that perhaps we might find a point or two like that if we had data for more recent years. That is certainly interesting. Were that to be true, what would drive that reversal of the dynamic of the two prices?
+
+Maybe there's a world(not this world and not a world we can infer from the data above) where people buy fewer fresh strawberries. Why? Let's look at some analysis of Chemical data to see if there are any reasons to avoid strawberries.
 
 ## Exploratory Data Analysis - Pesticides on Strawberries
-
-
-
