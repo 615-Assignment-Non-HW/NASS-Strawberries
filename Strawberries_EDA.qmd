@@ -22,7 +22,8 @@ The data itself is from the USDA NASS database, cleaned through much effort by H
 
 The first order of business is to split the data that remains from the earlier cleaning into market data and chemical data. This is done thus:
 
-```{r}
+```{r, echo = FALSE}
+
 #Loading the libraries we shall need
 library(knitr)
 library(tidyverse)
@@ -246,3 +247,32 @@ non_avg_chem <- chem |> filter(is.na(Aggregate_type)==TRUE)
 A look at the two data frames created as above gives us interesting information. It would appear that the 'non_avg-chem' data shows the total weight in pounds of a particular fertilizer applied in that particular Year. The 'avg-chem' data looks at various 'average' data. I would contend that average is a little bit of a misnomer here and calling these 'per unit' data would be more informative. We have lb/acre/year, lb/acre/application and the 'number'
 
 ## Exploratory Data Analysis - Market Data
+
+Preliminary Questions:
+
+-   What strawberries are most expensive? Intuitively you'd expect fresh market strawberries to have the highest markup. Is this true?
+-   W
+
+```{r}
+# There are a lot of NA values in this dataset. Let's remove them and see what we get from the rest:
+mkt_eda<- strwb_mkt |> filter(is.na(Value)==FALSE)
+
+#Looking at prices per cwt:
+
+prices<- mkt_eda |> filter( Measurement_Unit == " MEASURED IN $ / CWT") |>
+  filter(Purpose != "AGGREGATE") |> 
+  group_by(Purpose)
+
+ggplot(prices, aes(Purpose, Value))+
+  geom_violin(draw_quantiles = c(0.25,0.5,0.75))+
+  labs(
+    title="Relative distributions of Fresh Market and Production Market strawberry prices",
+    x="Market", y=" Price in $ / Hundredweight (lb)"
+  )
+  
+
+```
+We can tell from this graph that the overwhelming majority of fresh market strawberries are sold for significantly more than processing market strawberries. Just compare the median price per hundredweight(the middle lines in the violin plots). What's interesting is that the interquartile range for the two seems very similar at $40/cwt. The minimum and maximum values for fresh market strawberries are miles apart however. 
+This might be due to transportation costs or the mark-up at places like farmers markets, say. 
+
+What can we tell about how the difference in fresh market and processing varies between states?
