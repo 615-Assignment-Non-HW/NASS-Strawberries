@@ -295,13 +295,8 @@ diff_state_prices$Year<- factor(diff_state_prices$Year)
   
 ggplot(diff_state_prices, aes(State, market_diff, color = Year))+
   geom_point(size=3)+theme(axis.text.x = element_text(angle = 90, vjust = 1, 
-                                                      hjust=1),
-                           plot.title = element_text(size=12),
-                        axis.text=element_text(size=12),
-                        axis.title=element_text(size=12),
-                        legend.title = element_text(size=12),
-                        legend.text = element_text(size=12))+
-  labs(title="Yearly variations in Fresh vs Production Market Price by State",
+                                                      hjust=1))+
+  labs(title="Yearly Variations in Fresh Market vs Production Market Prices by State",
        x="State", y= "Price Difference\n Fresh market vs production market")
   
 
@@ -309,7 +304,7 @@ ggplot(diff_state_prices, aes(State, market_diff, color = Year))+
 
 ```
 
-We can see that california, relative to other states is relatively consistent in the difference in price of fresh market and production market strawberries. It is also on the lower side. North Carolina has the largest variation in the difference.
+We can see that California, relative to other states is relatively consistent in the difference in price of fresh market and production market strawberries. It is also on the lower side. North Carolina has the largest variation in the difference.
 
 What's also interesting here is how in 2016, east coast states observed a higher difference in price relative to west coast states.
 
@@ -317,13 +312,19 @@ What about yearly variations in these prices?
 
 ```{r}
 g<-ggplot(data=prices, aes(Year, Value, color=Purpose))+
-  geom_point()+suppressWarnings(stat_smooth())
-suppressWarnings(print(g))
+  geom_point()+stat_smooth()+
+  labs(title="Yearly Variation in price difference between strawberry markets",
+       x="Year",y="Price per Hundredweight")
+suppressMessages(suppressWarnings(print(g)))
 ```
 
-There is a limited amount of information we can glean from this - this is reflected in the increasing area of the error 'shadow' around the line. In large part this is due to the dwindling number of points each consecutive year. All the same, we can see that in none of the years do any of the fresh market prices go beneath those of even the highest production market. The overlap of the shadows towards the end might indicate that perhaps we might find a point or two like that if we had data for more recent years. That is certainly interesting. Were that to be true, what would drive that reversal of the dynamic of the two prices?
+I'll begin the discussion of this graph with a caveat: There is a limited amount of information we can glean from this - this is reflected in the increasing area of the error 'shadow' around the line. In large part this is due to the dwindling number of points each consecutive year. 
 
-Maybe there's a world(not this world and not a world we can infer from the data above) where people buy fewer fresh strawberries. Why? Let's look at some analysis of Chemical data to see if there are any reasons to avoid strawberries.
+All the same, there is some information we can see. There is a decreasing trend in both prices but also a decrease in the distance between the smoothed regression lines.  
+
+In none of the years do any of the fresh market prices go beneath those of even the highest production market. The overlap of the shadows and the increase in its area towards the end might indicate that perhaps we might find a point or two like that if we had more data for the more recent years and if the trend shown in the graph is backed up by that data. That is certainly interesting. Were that to be true, what would drive that reversal of the dynamic of the two prices?
+
+Maybe there's a world(not this world and not a world we can infer from the data above) where people buy fewer fresh strawberries. Why? 
 
 ## Exploratory Data Analysis - Pesticides on Strawberries
 
