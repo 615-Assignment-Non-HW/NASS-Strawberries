@@ -14,11 +14,11 @@ When was the last time you looked at your strawberries - not just a cursory exam
 -   How hazardous are these chemicals?
 -   Where are these chemicals used most?
 
-Considering the consistent placing of Strawberries on the 'Dirty Dozen' list, these are but a few of the questions we should think about. As consumers we should be concerned about the extensive use of pesticide in daily foods. As human beings with our instinct for self-preservation, we should be concerned about the chemicals we are putting in our bodies. So what can the data tell us? How alarmed should we be? I'll try to answer that first question. The second is left as an exercise for the reader.
+Considering the consistent placing of Strawberries on the 'Dirty Dozen' list(https://www.ewg.org/foodnews/dirty-dozen.php), these some  questions we should be thinking about. As consumers we should be concerned about the extensive use of pesticide in daily foods. As human beings with an instinct for self-preservation, we should be concerned about the chemicals we are putting in our bodies. So what can the data tell us? How alarmed should we be? I'll try to answer that first question. The second is left as an exercise for the reader.
 
 Before getting into the weeds with the pesticides, we shall also look at data on market information. Is there anything we can say about prices of strawberries, their end uses? It would certainly be a useful lens with which to color our later analysis.
 
-The data itself is from the USDA NASS database, cleaned through much effort by Haviland(though perhaps not one hundredth of the effort we should put into cleaning our strawberries if the results of this exercise are anything to go by). It is this data - collected by survey instead of census and focusing on non organic strawberries - that serves as the jumping off point for what follows.
+The data itself is from the USDA NASS database, cleaned through much effort on Haviland's part(though perhaps not one hundredth of the effort we should put into cleaning our strawberries). It is this data - collected by survey instead of census and focusing on non organic strawberries - that serves as the jumping off point for what follows.
 
 ## Data Cleaning and Organization
 
@@ -311,7 +311,7 @@ What's also interesting here is how in 2016, east coast states observed a higher
 
 What about yearly variations in these prices?
 
-```{r}
+```{r, echo=FALSE}
 g<-ggplot(data=prices, aes(Year, Value, color=Purpose))+
   geom_point()+stat_smooth()+
   labs(title="Yearly Variation in price difference between strawberry markets",
@@ -333,7 +333,7 @@ Let's start by looking at the amount of each pesticide sprayed per year and per 
 
 Starting with per year. If we try and plot all of our pesticides, it becomes impossible to glean anything clear because of the sheer range of the data. There are a few pesticides that are used in small quantities.I have I have a hunch that those will turn up in the per application graph so we'll graph their use per year separately.
 
-```{r}
+```{r, echo=FALSE}
 years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
   group_by(`Chemical Name`) |>  filter(Value>10)
 
@@ -349,7 +349,7 @@ ggplot(years, aes(`Chemical Name` ,Value, color=Year))+
 
 What about for the pesticides with smaller values?
 
-```{r}
+```{r, echo=FALSE}
 years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
   group_by(`Chemical Name`) |>  filter(Value<10&Value>0.3)
 
@@ -363,7 +363,7 @@ ggplot(years, aes(`Chemical Name` ,Value, color=Year))+
   labs(title="Application of Pesticides in LB/Acre/Year: 0.3< Value<10 ", x="Pesticide", y= "Amount applied in lb/acre/year")
 ```
 
-Now for the most interesting of this series of plot, the chemicals(and there are a lot of them) which are applied in smaller quantities per acre per year. I've gotten rid of colors here so we can see the variability in points more easily without being distracted
+Now for the most interesting of this series of plots, the chemicals(and there are a lot of them) which are applied in smaller quantities per acre per year. I've gotten rid of colors here so we can see the variability in points more easily without being distracted
 
 ```{r, echo=FALSE}
 years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
@@ -376,7 +376,7 @@ years$Year<- factor(years$Year)
 ggplot(years, aes(`Chemical Name` ,Value))+ 
   geom_point(size=3)+
   stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), 
-        geom="errorbar", color="red", width=0.2)+
+        geom="errorbar", color="orange", width=0.3)+
   theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1)
         )+ 
   labs(title="Application of Pesticides in LB/Acre/Year: Value<0.3 ", x="Pesticide", y= "Amount applied in lb/acre/year")
@@ -391,7 +391,7 @@ applications<- avg_chem |> filter(`Chemical Name` %in% years$`Chemical Name`) |>
 g<- ggplot(applications, aes(`Chemical Name` ,Value))+ 
   geom_point(size=3)+
   stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), 
-        geom="errorbar", color="red", width=0.2)+
+        geom="errorbar", color="orange", width=0.3)+
   theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1)
         )+ 
   labs(title="Application of Pesticides in LB/Acre/Application ", x="Pesticide", y= "Amount applied in lb/acre/application")
@@ -401,5 +401,44 @@ suppressWarnings(print(g))
 
 \`\`\`
 
-This data shows that all these compounds are used in incredibly small quantities per application. The relative amount used per application is extremely similar to the relative differences in amount used per year. What does this tell us? Are these pesticides very effective at doing their job? I would say that the data shows that, given the information we have(we could confirm this with information on yields of strawberry crops sprayed with different quantities of each pesticide but that's beyond the scope of this report). So why are they effective? Could it be because they are toxic. 
+This data shows that all these compounds are used in incredibly small quantities per application. The relative amount used per application is extremely similar to the relative differences in amount used per year. What does this tell us? Are these pesticides very effective at doing their job? I would say that the data shows that, given the information we have(we could confirm this with information on yields of strawberry crops sprayed with different quantities of each pesticide but that's beyond the scope of this report). So why are they effective? Could it be because they are toxic.
 
+Before we look at that, its worth noting that the application of azoxystrobin has a large error bar because of one point where it was applied in a large quantity.
+
+
+```{r, echo=FALSE}
+pot_toxic_chemicals<- hazard_info |> filter(
+  `Chemical Name` %in% years$`Chemical Name`)
+ggplot(pot_toxic_chemicals, aes(Hazard))+
+  geom_bar()+labs(
+    title="Hazard for Chemicals applied in small amounts per application",
+    y="Number")
+```
+So a decent number of these chemicals are either highly hazardous or moderately hazardous. More importantly only eight of them are not acutely hazardous. But this does put some paid to the theory that these would all be highly hazardous chemicals. Why don't we look at chemicals that are applied in large amounts. What is their toxicity like? 
+
+```{r, echo=FALSE}
+years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
+  group_by(`Chemical Name`) |>  filter(Value<10&Value>0.3)
+
+years<- years |> filter(is.na(Value)==FALSE)
+years$Year<- factor(years$Year)
+
+big_apps<- hazard_info |> filter(
+  `Chemical Name` %in% years$`Chemical Name`)
+
+ggplot(big_apps, aes(Hazard))+
+  geom_bar()+labs(
+    title="Hazard for Chemicals applied in large amounts per application",
+    y="Number")
+```
+This is interesting. It makes sense that a large number of these are not acutely hazardous. What this suggests is that the small number of severely hazardous chemicals applied is good because perhaps the large number of them are banned. All the same the large number of moderately hazardous chemicals applied is concerning. 
+
+Another thing to think about that might bear future exploration: What kind of spectrum is moderately hazardous? We have moderately hazardous chemicals applied in large quantities and in small. Are some much more hazardous than others?
+
+## Conculding Remarks
+
+Not good news I'm afraid. Regardless of the happy news that severely hazardous chemicals are not frequently applied and not in large quantities, very many other toxic pesticides do seem to be applied to strawberry crops and some of them in large quantitites. There is more delving that needs to be done:
+
+* What constitutes moderately hazardous? How does the toxicity of these chemicals vary?
+* How does the application amount of each chemical relate to the lethal dose(if it exists) for that chemical? How long before it is no longer fatal?
+* What is the environmental impact of these chemicals. Those that aren't toxic to humans could well be toxic to other animals. In fact while looking at the toxicity, I found that several of these chemicals are severely, acutely toxic to aquatic life which is a big problem if the pesticides get swept into local water bodies. 
