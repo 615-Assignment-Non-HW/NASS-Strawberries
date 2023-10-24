@@ -436,6 +436,8 @@ ggplot(pot_toxic_chemicals, aes(Hazard))+
     title="Hazard for Chemicals applied in small amounts per application",
     y="Number")
 ```
+
+
 So a decent number of these chemicals are either highly hazardous or moderately hazardous. More importantly only eight of them are not acutely hazardous. But this does put some paid to the theory that these would all be highly hazardous chemicals. Why don't we look at chemicals that are applied in large amounts. What is their toxicity like? 
 
 ```{r, echo=FALSE}
