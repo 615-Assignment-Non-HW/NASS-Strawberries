@@ -324,7 +324,7 @@ All the same, there is some information we can see. There is a decreasing trend 
 
 In none of the years do any of the fresh market prices go beneath those of even the highest production market. The overlap of the shadows and the increase in its area towards the end might indicate that perhaps we might find a point or two like that if we had more data for the more recent years and if the trend shown in the graph is backed up by that data. That is certainly interesting. Were that to be true, what would drive that reversal of the dynamic of the two prices?
 
-Maybe there's a world(not this world and not a world we can infer from the data above) where people buy fewer fresh strawberries. Why? 
+Maybe there's a world(not this world and not a world we can infer from the data above) where people buy fewer fresh strawberries. Why? Because who wants to eat chemically-tainted strawberries?
 
 ## Exploratory Data Analysis - Pesticides on Strawberries
 
