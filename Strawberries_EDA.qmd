@@ -24,13 +24,14 @@ The data itself is from the USDA NASS database, cleaned through much effort by H
 
 The first order of business is to split the data that remains from the earlier cleaning into market data and chemical data. This is done thus:
 
-```{r, echo = FALSE}
+```{r}
 
 #Loading the libraries we shall need
 library(knitr)
 library(tidyverse)
 library(stringr)
 library(ggplot2)
+library("Hmisc")
 
 strwb_survey<- read.csv("strwb_survey.csv", header = TRUE)
 
@@ -253,9 +254,9 @@ A look at the two data frames created as above gives us interesting information.
 Preliminary Questions:
 
 -   What strawberries are most expensive? Intuitively you'd expect fresh market strawberries to have the highest markup. Is this true?
--   W
+-   How do prices vary across state?
 
-```{r}
+```{r, echo=FALSE}
 # There are a lot of NA values in this dataset. Let's remove them and see what we get from the rest:
 mkt_eda<- strwb_mkt |> filter(is.na(Value)==FALSE)
 
@@ -279,7 +280,7 @@ We can tell from this graph that the overwhelming majority of fresh market straw
 
 What can we tell about how the difference in fresh market and processing varies between states?
 
-```{r}
+```{r, echo=FALSE}
 state_prices<- mkt_eda |> filter( Measurement_Unit == " MEASURED IN $ / CWT") |>
   filter(Purpose != "AGGREGATE") |> group_by(State)
 
@@ -318,9 +319,9 @@ g<-ggplot(data=prices, aes(Year, Value, color=Purpose))+
 suppressMessages(suppressWarnings(print(g)))
 ```
 
-I'll begin the discussion of this graph with a caveat: There is a limited amount of information we can glean from this - this is reflected in the increasing area of the error 'shadow' around the line. In large part this is due to the dwindling number of points each consecutive year. 
+I'll begin the discussion of this graph with a caveat: There is a limited amount of information we can glean from this - this is reflected in the increasing area of the error 'shadow' around the line. In large part this is due to the dwindling number of points each consecutive year.
 
-All the same, there is some information we can see. There is a decreasing trend in both prices but also a decrease in the distance between the smoothed regression lines.  
+All the same, there is some information we can see. There is a decreasing trend in both prices but also a decrease in the distance between the smoothed regression lines.
 
 In none of the years do any of the fresh market prices go beneath those of even the highest production market. The overlap of the shadows and the increase in its area towards the end might indicate that perhaps we might find a point or two like that if we had more data for the more recent years and if the trend shown in the graph is backed up by that data. That is certainly interesting. Were that to be true, what would drive that reversal of the dynamic of the two prices?
 
@@ -330,7 +331,7 @@ Maybe there's a world(not this world and not a world we can infer from the data 
 
 Let's start by looking at the amount of each pesticide sprayed per year and per application. These tell us two different things. Per year tells us which pesticide is used the most. Per application gives some information about the relative efficacy of each pesticide.
 
-Starting with per year. If we try and plot all of our pesticides, it becomes impossible to glean anything clear. There are a few pesticides that are used in small quantities so let's not look at those.
+Starting with per year. If we try and plot all of our pesticides, it becomes impossible to glean anything clear because of the sheer range of the data. There are a few pesticides that are used in small quantities.I have I have a hunch that those will turn up in the per application graph so we'll graph their use per year separately.
 
 ```{r}
 years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
@@ -341,11 +342,64 @@ years$Year<- factor(years$Year)
 
 ggplot(years, aes(`Chemical Name` ,Value, color=Year))+ 
   geom_point(size=3)+
-  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1),
-        plot.title = element_text(size=14), 
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12), 
-        legend.title = element_text(size=12), 
-        legend.text = element_text(size=12))+ 
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1)
+        )+ 
   labs(title="Application of Pesticides in LB/Acre/Year - Value Greater than 10", x="Pesticide", y= "Amount applied in lb/acre/year")
 ```
+
+What about for the pesticides with smaller values?
+
+```{r}
+years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
+  group_by(`Chemical Name`) |>  filter(Value<10&Value>0.3)
+
+years<- years |> filter(is.na(Value)==FALSE)
+years$Year<- factor(years$Year) 
+
+ggplot(years, aes(`Chemical Name` ,Value, color=Year))+ 
+  geom_point(size=3)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1)
+        )+ 
+  labs(title="Application of Pesticides in LB/Acre/Year: 0.3< Value<10 ", x="Pesticide", y= "Amount applied in lb/acre/year")
+```
+
+Now for the most interesting of this series of plot, the chemicals(and there are a lot of them) which are applied in smaller quantities per acre per year. I've gotten rid of colors here so we can see the variability in points more easily without being distracted
+
+```{r, echo=FALSE}
+years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
+  group_by(`Chemical Name`) |>  filter(Value<0.3)
+
+years<- years |> filter(is.na(Value)==FALSE)
+years$Year<- factor(years$Year) 
+
+
+ggplot(years, aes(`Chemical Name` ,Value))+ 
+  geom_point(size=3)+
+  stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), 
+        geom="errorbar", color="red", width=0.2)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1)
+        )+ 
+  labs(title="Application of Pesticides in LB/Acre/Year: Value<0.3 ", x="Pesticide", y= "Amount applied in lb/acre/year")
+```
+
+So let's use the same chemicals as in the graph above but let's look at their quantity per application.
+
+```{r, echo=FALSE}
+applications<- avg_chem |> filter(`Chemical Name` %in% years$`Chemical Name`) |> 
+  filter(Measurement_Unit==" MEASURED IN LB / ACRE / APPLICATION")
+
+g<- ggplot(applications, aes(`Chemical Name` ,Value))+ 
+  geom_point(size=3)+
+  stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), 
+        geom="errorbar", color="red", width=0.2)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1)
+        )+ 
+  labs(title="Application of Pesticides in LB/Acre/Application ", x="Pesticide", y= "Amount applied in lb/acre/application")
+
+suppressWarnings(print(g))
+```
+
+\`\`\`
+
+This data shows that all these compounds are used in incredibly small quantities per application. The relative amount used per application is extremely similar to the relative differences in amount used per year. What does this tell us? Are these pesticides very effective at doing their job? I would say that the data shows that, given the information we have(we could confirm this with information on yields of strawberry crops sprayed with different quantities of each pesticide but that's beyond the scope of this report). So why are they effective? Could it be because they are toxic. 
+
