@@ -40,11 +40,11 @@ strwb_survey_c<- strwb_survey |> filter(Pesticide_or_Market == " BEARING - APPLI
 strwb_mkt<- strwb_survey |> filter(Pesticide_or_Market != " BEARING - APPLICATIONS")
 ```
 
-The data being read in here
+The data being read in here is the data that Haviland cleaned, with a couple columns named by me and written into a csv file.
 
 #### Cleaning Market Data
 
-Let us consider first, the market data. A view statement shows us what it looks like and what needs to be done to clean it. I won't print that View statement here but suffice it to say there are changes that can be made here to clean the data. First the column I have named Price or Weight. It transpires that this is hardly an appropriate name.
+Let us consider first, the market data. A view statement shows us what it looks like and what needs to be done to clean it. I won't print that View statement here but suffice it to say there are changes that can be made here to clean the data. First, regarding the column I have named Price or Weight: It transpires that this is hardly an appropriate name.
 
 ```{r}
 strwb_mkt |> distinct(Price_or_Weight.)
@@ -56,7 +56,7 @@ We can see that this column takes three distinct values: "PRICE RECEIVED", NA an
 
 A quick examination tells us that Price or Production can be interpolated from one of the next two columns.
 
-What about the name of the Pesticide or Market column? This seemed fitting when I used the column to split chemical and market data. We can check distinct Domain Categories to confirm that this is a valid way to split the data. But having been split, what information does this column now convey?
+What about the name of the Pesticide or Market column? This seemed fitting when I used the column to subset chemical and market data. We can check distinct Domain Categories to confirm that this is a valid way to subset our data. But in the market subset, what information does this column now convey?
 
 The code below deals with both these issues.
 
@@ -326,3 +326,28 @@ There is a limited amount of information we can glean from this - this is reflec
 Maybe there's a world(not this world and not a world we can infer from the data above) where people buy fewer fresh strawberries. Why? Let's look at some analysis of Chemical data to see if there are any reasons to avoid strawberries.
 
 ## Exploratory Data Analysis - Pesticides on Strawberries
+
+Let's start by looking at the amount of each pesticide sprayed per year and per application. These tell us two different things. Per year tells us which pesticide is used the most. Per application gives some information about the relative efficacy of each pesticide.
+
+Starting with per year. If we try and plot all of our pesticides, it becomes impossible to glean anything clear. There are a few pesticides that are used in small quantities so let's not look at those.
+
+
+```{r}
+years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
+  group_by(`Chemical Name`) |>  filter(Value>10)
+
+years<- years |> filter(is.na(Value)==FALSE)
+years$Year<- factor(years$Year) 
+
+ggplot(years, aes(`Chemical Name` ,Value, color=Year))+ 
+  geom_point(size=3)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust=1),
+        plot.title = element_text(size=14), 
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12), 
+        legend.title = element_text(size=12), 
+        legend.text = element_text(size=12))+ 
+  labs(title="Application of Pesticides in LB/Acre/Year - Value Greater than 10", x="Pesticide", y= "Amount applied in lb/acre/year")
+```
+
+
