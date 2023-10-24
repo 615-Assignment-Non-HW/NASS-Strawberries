@@ -37,8 +37,10 @@ strwb_survey<- read.csv("strwb_survey.csv", header = TRUE)
 
 #Extracting the data relevant to chemicals using the Pesticide or Market Column
 
-strwb_survey_c<- strwb_survey |> filter(Pesticide_or_Market == " BEARING - APPLICATIONS")
-strwb_mkt<- strwb_survey |> filter(Pesticide_or_Market != " BEARING - APPLICATIONS")
+strwb_survey_c<- strwb_survey |> filter(Pesticide_or_Market ==
+                                          " BEARING - APPLICATIONS")
+strwb_mkt<- strwb_survey |> filter(Pesticide_or_Market != 
+                                     " BEARING - APPLICATIONS")
 ```
 
 The data being read in here is the data that Haviland cleaned, with a couple columns named by me and written into a csv file.
@@ -83,11 +85,12 @@ But now we see the Purpose column doesn't always have purpose. Sometimes it cont
 
 ```{r}
 strwb_mkt$Measurement_Unit<- ifelse(is.na(strwb_mkt$Measurement_Unit),
-                                    strwb_mkt$Purpose,strwb_mkt$Measurement_Unit)
+                                strwb_mkt$Purpose,strwb_mkt$Measurement_Unit)
 strwb_mkt$Purpose<- str_replace(strwb_mkt$Purpose,"- PRICE RECEIVED","")
 strwb_mkt$Purpose<- str_replace(strwb_mkt$Purpose,"- PRODUCTION","")
 
-strwb_mkt$Purpose<- ifelse(str_detect(strwb_mkt$Purpose,"MEASURED")==TRUE, "AGGREGATE",
+strwb_mkt$Purpose<- ifelse(str_detect(strwb_mkt$Purpose,"MEASURED")==TRUE, 
+                           "AGGREGATE",
                            strwb_mkt$Purpose)
 
 strwb_mkt$Aggregate_type<- ifelse(strwb_mkt$Purpose == "Aggregate", 
@@ -99,11 +102,15 @@ Measurement Unit doesn't seem to always represent measurement unit and in fact p
 
 ```{r}
 
-a<- strwb_mkt$Measurement_Unit[which(str_detect(strwb_mkt$Measurement_Unit,"MEASURED")==FALSE)]
-b<- strwb_mkt$Aggregate_type[which(str_detect(strwb_mkt$Measurement_Unit,"MEASURED")==FALSE)]
+a<- strwb_mkt$Measurement_Unit[which(str_detect(strwb_mkt$Measurement_Unit,
+                                                "MEASURED")==FALSE)]
+b<- strwb_mkt$Aggregate_type[which(str_detect(strwb_mkt$Measurement_Unit,
+                                              "MEASURED")==FALSE)]
 
-strwb_mkt$Aggregate_type[which(str_detect(strwb_mkt$Measurement_Unit,"MEASURED")==FALSE)]<- a
-strwb_mkt$Measurement_Unit[which(str_detect(strwb_mkt$Measurement_Unit,"MEASURED")==FALSE)]<- b
+strwb_mkt$Aggregate_type[which(str_detect(strwb_mkt$Measurement_Unit,
+                                          "MEASURED")==FALSE)]<- a
+strwb_mkt$Measurement_Unit[which(str_detect(strwb_mkt$Measurement_Unit,
+                                            "MEASURED")==FALSE)]<- b
 
 #Casting all non numeric values as NA
 strwb_mkt$Value<- suppressWarnings(as.numeric(strwb_mkt$Value))
@@ -118,23 +125,34 @@ We start by extracting all the chemical information we can from the data we have
 ```{r}
 #Getting the Chemical Type and putting it into its own column
 strwb_survey_chem1 <- strwb_survey_c |> mutate(`Chemical Type` = 
-                                               str_sub(Domain,str_locate(Domain,"CHEMICAL,")[,2]+1,),
+                        str_sub(Domain,str_locate(Domain,"CHEMICAL,")[,2]+1,),
                                              .after= Domain.Category)
 
 #Extracting Chemical Name into a column
 strwb_survey_chem1<- strwb_survey_chem1 |> mutate(`Chemical Name`=
-                                                    str_sub(Domain.Category,
-                                                    str_locate(Domain.Category,":")[,2]+3,
-                                                    str_locate(Domain.Category,"=")[,1]-2),
+                                            str_sub(Domain.Category,
+                                          str_locate(Domain.Category,":")[,2]+3,
+                                        str_locate(Domain.Category,"=")[,1]-2),
                                                   .after = `Chemical Type`)
 #Extracting Chemical ID into a column
 strwb_survey_chem1<- strwb_survey_chem1 |> mutate(`Chemical ID`=
-                                                    str_sub(Domain.Category,-7), .after= `Chemical Name`)
-strwb_survey_chem1$`Chemical ID`<- str_sub(strwb_survey_chem1$`Chemical ID`,1,-2)
-strwb_survey_chem1$`Chemical ID`<- ifelse(strwb_survey_chem1$Domain=="TOTAL",NA,strwb_survey_chem1$`Chemical ID`)
-strwb_survey_chem1$`Chemical ID`<- ifelse(str_detect(strwb_survey_chem1$Domain.Category,"TOTAL")==TRUE,NA,strwb_survey_chem1$`Chemical ID`)
-strwb_survey_chem1$`Chemical ID`<- str_replace(strwb_survey_chem1$`Chemical ID`,"=","")
-strwb_survey_chem1$`Chemical ID`<- str_trim(strwb_survey_chem1$`Chemical ID`, side = 'both')
+                          str_sub(Domain.Category,-7), .after= `Chemical Name`)
+
+strwb_survey_chem1$`Chemical ID`<-
+  str_sub(strwb_survey_chem1$`Chemical ID`,1,-2)
+
+strwb_survey_chem1$`Chemical ID`<- ifelse(strwb_survey_chem1$Domain=="TOTAL",
+                                          NA,strwb_survey_chem1$`Chemical ID`)
+
+strwb_survey_chem1$`Chemical ID`<- 
+  ifelse(str_detect(strwb_survey_chem1$Domain.Category,"TOTAL")==TRUE,NA,
+                                          strwb_survey_chem1$`Chemical ID`)
+
+strwb_survey_chem1$`Chemical ID`<- 
+  str_replace(strwb_survey_chem1$`Chemical ID`,"=","")
+
+strwb_survey_chem1$`Chemical ID`<- 
+  str_trim(strwb_survey_chem1$`Chemical ID`, side = 'both')
 
 strwb_survey_chem<- strwb_survey_chem1
 ```
@@ -149,34 +167,34 @@ chemical_list<- strwb_survey_chem |> filter(is.na(`Chemical Name`)!=TRUE) |>
 
 #Finding the CAS numbers corresponding to each chemical:
 
-CAS_no<- c("131860-33-8","","","","","","1219521-95-5","1303-96-4","188425-85-6",
-           "","133-06-2","20543-04-8","180409-60-3","121552-61-2","119446-68-3",
-           "126833-17-8","131341-86-1","658066-35-4","907204-31-3","39148-24-8",
-           "875915-78-9","70630-17-0","13492-26-7","88671-89-0","183675-82-3",
-           "146659-78-1","	298-14-6","60207-90-1","	175013-18-0","53112-28-0",
-           "878790-59-1","","7704-34-9","112281-77-3","23564-05-8","137-26-8",
-           "141517-21-7","68694-11-1","128639-02-1","103361-09-7","38641-94-0",
-           "70901-12-1","15299-99-7","42874-03-3","1910-42-5","	40487-42-1",
-           "71751-41-2","57960-19-7","135410-20-7","108168-76-9","63428-82-0",
-           "149877-41-8","82657-04-3","68038-71-1","68038-71-1","68038-71-1",
-           "68038-71-1","68038-71-1","69327-76-0","","120962-03-0","500008-45-7",
-           "","736994-63-1","400882-07-7","333-41-5","153233-91-1","13356-08-6",
-           "39515-41-8","134098-61-6","158062-67-0","951659-40-8","","78587-05-0",
-           "138261-41-3","121-75-5","161050-58-4","300-76-5","8002-65-1","947173-77-5",
-           "116714-46-6","64742-89-8","51-03-6","67701-09-1","8003-34-7","96489-71-3",
-           "95737-68-1","935545-74-7","131929-60-7","283594-90-1","153719-23-4",
-           "135158-54-2","334-48-5","124-07-2","8023-77-6","76-06-2","542-75-6",
-           "76674-21-0","8000-78-0","7722-84-1","10045-86-0","137-41-7","8012-95-1",
-           "","79-21-0","1312-76-1","","","1228284-64-7","99129-21-2","14215-52-2",
-           "87674-68-8","81406-37-3","100784-20-1","145701-23-1","63-25-2","120928-09-8",
-           "946578-00-3","525-79-1","16672-87-0","133-32-4","","20427-59-2","67892-31-3",
-           "77182-82-2","	122836-35-5","2921-88-2","8001-22-7","1315501-18-8","","",
-           "68038-71-1","","108-62-3","137-42-8","","1332-65-6","2439-10-3","66332-96-5",
-           "2008-39-1","32341-80-3","52315-07-8","68424-85-1","32426-11-2","5538-94-3",
-           "7173-51-5","36734-19-7","155569-91-8","91465-08-6","203313-25-1","57-06-7",
-           "624-92-0","1317-39-1","63718-65-0","272451-65-7","74-83-9","1897-45-6",
-           "120116-88-3","8018-01-7","115-29-7","404-86-4","",	"57754-85-5","122-34-9",
-           "5902-51-2","15708-41-5","81777-89-1")
+CAS_no<-c("131860-33-8","","","","","","1219521-95-5","1303-96-4","188425-85-6",
+     "","133-06-2","20543-04-8","180409-60-3","121552-61-2","119446-68-3",
+     "126833-17-8","131341-86-1","658066-35-4","907204-31-3","39148-24-8",
+       "875915-78-9","70630-17-0","13492-26-7","88671-89-0","183675-82-3",
+       "146659-78-1","	298-14-6","60207-90-1","	175013-18-0","53112-28-0",
+        "878790-59-1","","7704-34-9","112281-77-3","23564-05-8","137-26-8",
+       "141517-21-7","68694-11-1","128639-02-1","103361-09-7","38641-94-0",
+       "70901-12-1","15299-99-7","42874-03-3","1910-42-5","	40487-42-1",
+       "71751-41-2","57960-19-7","135410-20-7","108168-76-9","63428-82-0",
+       "149877-41-8","82657-04-3","68038-71-1","68038-71-1","68038-71-1",
+      "68038-71-1","68038-71-1","69327-76-0","","120962-03-0","500008-45-7",
+   "","736994-63-1","400882-07-7","333-41-5","153233-91-1","13356-08-6",
+        "39515-41-8","134098-61-6","158062-67-0","951659-40-8","","78587-05-0",
+    "138261-41-3","121-75-5","161050-58-4","300-76-5","8002-65-1","947173-77-5",
+    "116714-46-6","64742-89-8","51-03-6","67701-09-1","8003-34-7","96489-71-3",
+     "95737-68-1","935545-74-7","131929-60-7","283594-90-1","153719-23-4",
+     "135158-54-2","334-48-5","124-07-2","8023-77-6","76-06-2","542-75-6",
+  "76674-21-0","8000-78-0","7722-84-1","10045-86-0","137-41-7","8012-95-1",
+    "","79-21-0","1312-76-1","","","1228284-64-7","99129-21-2","14215-52-2",
+  "87674-68-8","81406-37-3","100784-20-1","145701-23-1","63-25-2","120928-09-8",
+  "946578-00-3","525-79-1","16672-87-0","133-32-4","","20427-59-2","67892-31-3",
+  "77182-82-2","	122836-35-5","2921-88-2","8001-22-7","1315501-18-8","","",
+  "68038-71-1","","108-62-3","137-42-8","","1332-65-6","2439-10-3","66332-96-5",
+    "2008-39-1","32341-80-3","52315-07-8","68424-85-1","32426-11-2","5538-94-3",
+   "7173-51-5","36734-19-7","155569-91-8","91465-08-6","203313-25-1","57-06-7",
+     "624-92-0","1317-39-1","63718-65-0","272451-65-7","74-83-9","1897-45-6",
+   "120116-88-3","8018-01-7","115-29-7","404-86-4","",	"57754-85-5","122-34-9",
+       "5902-51-2","15708-41-5","81777-89-1")
 
 chemical_list$CAS_no<- CAS_no
 
@@ -188,7 +206,8 @@ Now, these CAS codes are cross-referenced with the WHO's Classification of Pesti
 #Reading in UN information on hazards by CAS number
 library(readxl)
 hazards <- read_xlsx("WHO_codes.xlsx")
-hazards$CAS_no <- str_trim(str_sub(hazards$CAS,1,str_locate(hazards$CAS," ")[,2]),"both")
+hazards$CAS_no <- str_trim(str_sub(hazards$CAS,1,
+                                   str_locate(hazards$CAS," ")[,2]),"both")
 
 codes<- hazards$CAS_no
 
@@ -206,7 +225,8 @@ hazards$Hazard <- ifelse(hazards$Toxicity=="Ia","Extremely hazardous",
                   ifelse(hazards$Toxicity =="U","Not acutely hazardous",
                   ifelse(hazards$Toxicity=="FM","Fumigant","Obsolete"))))))
 
-hazard_info<- merge(x =chemical_list,y=hazards,by="CAS_no", x.chemical_list=TRUE)
+hazard_info<- merge(x =chemical_list,y=hazards,by="CAS_no",
+                    x.chemical_list=TRUE)
 
 #adding in a few chemicals whose codes were missing by hand
 
@@ -237,7 +257,8 @@ strwb_chem_info$Value <- ifelse(strwb_chem_info$Value == "
 To prepare for EDA let's do a few more things to the chemical data.
 
 ```{r}
-#We are going to filter our data set so we look only at those entries for which we have hazard information
+#We are going to filter our data set so we look only at those 
+#entries for which we have hazard information
 
 chem<- strwb_chem_info |> filter(is.na(Hazard)!=TRUE)
 
@@ -257,7 +278,8 @@ Preliminary Questions:
 -   How do prices vary across state?
 
 ```{r, echo=FALSE}
-# There are a lot of NA values in this dataset. Let's remove them and see what we get from the rest:
+# There are a lot of NA values in this dataset. Let's remove them 
+#and see what we get from the rest:
 mkt_eda<- strwb_mkt |> filter(is.na(Value)==FALSE)
 
 #Looking at prices per cwt:
@@ -269,7 +291,7 @@ prices<- mkt_eda |> filter( Measurement_Unit == " MEASURED IN $ / CWT") |>
 ggplot(prices, aes(Purpose, Value))+
   geom_violin(draw_quantiles = c(0.25,0.5,0.75))+
   labs(
-    title="Relative distributions of Fresh Market and Production Market strawberry prices",
+title="Relative distributions of Fresh Market and Production Market strawberry prices",
     x="Market", y=" Price in $ / Hundredweight (lb)"
   )
   
