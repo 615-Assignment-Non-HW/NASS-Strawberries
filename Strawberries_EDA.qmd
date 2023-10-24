@@ -276,3 +276,44 @@ We can tell from this graph that the overwhelming majority of fresh market straw
 This might be due to transportation costs or the mark-up at places like farmers markets, say. 
 
 What can we tell about how the difference in fresh market and processing varies between states?
+
+```{r}
+state_prices<- mkt_eda |> filter( Measurement_Unit == " MEASURED IN $ / CWT") |>
+  filter(Purpose != "AGGREGATE") |> group_by(State)
+
+#calcualte the difference between each row:
+
+state_prices<- state_prices |> mutate(market_diff = 
+  Value - lag(Value, default = Value[1])) |> select(Year, State, market_diff) 
+
+rows <- seq(1,38)
+diff_state_prices<- state_prices[rows%%2==0,]
+diff_state_prices$market_diff<- abs(diff_state_prices$market_diff)
+diff_state_prices$Year<- factor(diff_state_prices$Year)
+  
+ggplot(diff_state_prices, aes(State, market_diff, color = Year))+
+  geom_point(size=3)+theme(axis.text.x = element_text(angle = 90, vjust = 1, 
+                                                      hjust=1),
+                           plot.title = element_text(size=12),
+                        axis.text=element_text(size=12),
+                        axis.title=element_text(size=12),
+                        legend.title = element_text(size=12),
+                        legend.text = element_text(size=12))+
+  labs(title="Yearly variations in Fresh vs Production Market Price by State",
+       x="State", y= "Price Difference\n Fresh market vs production market")
+  
+
+
+
+```
+We can see that california, relative to other states is relatively consistent in the difference in price of fresh market and production market strawberries. It is also on the lower side. North Carolina has the largest variation in the difference. 
+
+What's also interesting here is how in 2016, east coast states observed a higher difference in price relative to west coast states. 
+
+What about yearly variations in these prices?
+```{r}
+ggplot(data=prices, aes(Year, Value, color=Purpose))+
+  geom_point()+suppressWarnings(stat_smooth())
+```
+
+
