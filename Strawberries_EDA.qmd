@@ -14,7 +14,8 @@ When was the last time you looked at your strawberries - not just a cursory exam
 -   How hazardous are these chemicals?
 -   Where are these chemicals used most?
 
-Considering the consistent placing of Strawberries on the 'Dirty Dozen' list(https://www.ewg.org/foodnews/dirty-dozen.php), these some  questions we should be thinking about. As consumers we should be concerned about the extensive use of pesticide in daily foods. As human beings with an instinct for self-preservation, we should be concerned about the chemicals we are putting in our bodies. So what can the data tell us? How alarmed should we be? I'll try to answer that first question. The second is left as an exercise for the reader.
+Considering the consistent placing of Strawberries on the 'Dirty Dozen'list,
+(https://www.ewg.org/foodnews/dirty-dozen.php) these some  questions we should be thinking about. As consumers we should be concerned about the extensive use of pesticide in daily foods. As human beings with an instinct for self-preservation, we should be concerned about the chemicals we are putting in our bodies. So what can the data tell us? How alarmed should we be? I'll try to answer that first question. The second is left as an exercise for the reader.
 
 Before getting into the weeds with the pesticides, we shall also look at data on market information. Is there anything we can say about prices of strawberries, their end uses? It would certainly be a useful lens with which to color our later analysis.
 
@@ -61,9 +62,8 @@ A quick examination tells us that Price or Production can be interpolated from o
 
 What about the name of the Pesticide or Market column? This seemed fitting when I used the column to subset chemical and market data. We can check distinct Domain Categories to confirm that this is a valid way to subset our data. But in the market subset, what information does this column now convey?
 
-The code below deals with both these issues.
 
-```{r}
+```{r, echo=FALSE}
 
 #Getting Price or Production values
 strwb_mkt$PriceProduction<-ifelse(is.na(strwb_mkt$PriceProduction)==FALSE,
@@ -98,7 +98,7 @@ strwb_mkt$Aggregate_type<- ifelse(strwb_mkt$Purpose == "Aggregate",
                                   strwb_mkt$Aggregate_type)
 ```
 
-Measurement Unit doesn't seem to always represent measurement unit and in fact probably contains aggregate type instead - for example where it says "Production Utilization". Let's fix that:
+Measurement Unit doesn't seem to always represent measurement unit and in fact probably contains aggregate type instead - for example where it says "Production Utilization". Let's fix that by switching the data in those two columns in such situations
 
 ```{r}
 
@@ -159,7 +159,7 @@ strwb_survey_chem<- strwb_survey_chem1
 
 Now we will use the PC codes we've extracted and placed in Chemical ID and use the EPA Pesticide Chemical Search (https://ordspub.epa.gov/ords/pesticides/f?p=chemicalsearch:1) to find CAS codes where we can.
 
-```{r}
+```{r, echo=FALSE}
 #Creating a list of distinct chemical names in the dataset, their ids
 chemical_list<- strwb_survey_chem |> filter(is.na(`Chemical Name`)!=TRUE) |>
                 distinct(`Chemical Name`,.keep_all = TRUE)|> 
