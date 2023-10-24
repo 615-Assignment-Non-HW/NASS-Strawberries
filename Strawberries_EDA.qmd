@@ -8,7 +8,7 @@ engine: knitr
 
 ## Introduction: The data, the motivations
 
-When was the last time you looked at your strawberries - not just a cursory examination before you ate them, but really looked? At the labels, at the warnings and cautions and USDA certifications and the chemicals they spray on them? I had certainly never considered any of those factors until this assignment, until we were told that perhaps this was something to look into, until Haviland Wright painted for us the extent to which strawberries are not to be trusted.
+When was the last time you looked at your strawberries - not just a cursory examination before you ate them - but when you really looked? At the labels, at the warnings and cautions and USDA certifications and the chemicals they spray on them? I had certainly never considered any of those factors until this assignment, until we were told that perhaps this was something to look into, until Haviland Wright painted for us the extent to which strawberries are not to be trusted.
 
 -   What sort of chemicals are being used on strawberries?
 -   How hazardous are these chemicals?
@@ -331,7 +331,6 @@ Let's start by looking at the amount of each pesticide sprayed per year and per 
 
 Starting with per year. If we try and plot all of our pesticides, it becomes impossible to glean anything clear. There are a few pesticides that are used in small quantities so let's not look at those.
 
-
 ```{r}
 years<- avg_chem |> filter(Measurement_Unit==" MEASURED IN LB / ACRE / YEAR") |>
   group_by(`Chemical Name`) |>  filter(Value>10)
@@ -349,5 +348,3 @@ ggplot(years, aes(`Chemical Name` ,Value, color=Year))+
         legend.text = element_text(size=12))+ 
   labs(title="Application of Pesticides in LB/Acre/Year - Value Greater than 10", x="Pesticide", y= "Amount applied in lb/acre/year")
 ```
-
-
