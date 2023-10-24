@@ -107,7 +107,7 @@ strwb_mkt$Value<- suppressWarnings(as.numeric(strwb_mkt$Value))
 
 That's the market data cleaned.
 
-#### Chemical Data
+#### Cleaning Chemical Data
 
 We start by extracting all the chemical information we can from the data we have. This is stored in the Domain and Domain Category columns.
 
@@ -225,9 +225,24 @@ hazard_info<-rbind(hazard_info,c("","PAECILOMYCES FUMOSOR","115002","U",
 strwb_chem_info<- merge(x=strwb_survey_chem,y=hazard_info, by= "Chemical Name", 
                         all.x=TRUE)
 
-strwb_chem_info$Value <- ifelse(strwb_chem_info$Value == "(D)", NA,
-                                strwb_chem_info$Value)
+strwb_chem_info$Value <- suppressWarnings(as.numeric(strwb_chem_info$Value))
 strwb_chem_info$Value <- ifelse(strwb_chem_info$Value == "	
 (NA)", NA,strwb_chem_info$Value)
 ```
 
+To prepare for EDA let's do a few more things to the chemical data.
+
+```{r}
+#We are going to filter our data set so we look only at those entries for which we have hazard information
+
+chem<- strwb_chem_info |> filter(is.na(Hazard)!=TRUE)
+
+#Data with the aggregate type = AVG. What does AVG actually show us?
+
+avg_chem <- chem |> filter(Aggregate_type==" AVG")
+non_avg_chem <- chem |> filter(is.na(Aggregate_type)==TRUE)
+```
+
+A look at the two data frames created as above gives us interesting information. It would appear that the 'non_avg-chem' data shows the total weight in pounds of a particular fertilizer applied in that particular Year. The 'avg-chem' data looks at various 'average' data. I would contend that average is a little bit of a misnomer here and calling these 'per unit' data would be more informative. We have lb/acre/year, lb/acre/application and the 'number'
+
+## Exploratory Data Analysis - Market Data
